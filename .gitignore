@@ -1,7 +1,6 @@
 # Tool-specific files
 .specstory/
 .cursorindexingignore
-.cursorrules
 
 # Dependencies
 node_modules/

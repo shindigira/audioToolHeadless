@@ -1,121 +1,41 @@
 /**
- * Headless Audio Player
- * A lightweight TypeScript module for audio playback without UI dependencies
+ * Example TypeScript function demonstrating typed .reduce
  */
 
-export class AudioPlayer {
-  private audio: HTMLAudioElement;
-  private isPlaying: boolean = false;
-
-  constructor() {
-    this.audio = new Audio();
-    this.setupEventListeners();
-  }
-
-  private setupEventListeners(): void {
-    this.audio.addEventListener('play', () => {
-      this.isPlaying = true;
-    });
-
-    this.audio.addEventListener('pause', () => {
-      this.isPlaying = false;
-    });
-
-    this.audio.addEventListener('ended', () => {
-      this.isPlaying = false;
-    });
-  }
-
-  /**
-   * Load an audio file from URL
-   */
-  load(url: string): void {
-    this.audio.src = url;
-  }
-
-  /**
-   * Play the loaded audio
-   */
-  async play(): Promise<void> {
-    try {
-      await this.audio.play();
-    } catch (error) {
-      console.error('Failed to play audio:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Pause the audio playback
-   */
-  pause(): void {
-    this.audio.pause();
-  }
-
-  /**
-   * Stop the audio and reset to beginning
-   */
-  stop(): void {
-    this.audio.pause();
-    this.audio.currentTime = 0;
-  }
-
-  /**
-   * Set the volume (0-1)
-   */
-  setVolume(volume: number): void {
-    this.audio.volume = Math.max(0, Math.min(1, volume));
-  }
-
-  /**
-   * Get current volume
-   */
-  getVolume(): number {
-    return this.audio.volume;
-  }
-
-  /**
-   * Seek to specific time in seconds
-   */
-  seek(time: number): void {
-    this.audio.currentTime = time;
-  }
-
-  /**
-   * Get current playback time in seconds
-   */
-  getCurrentTime(): number {
-    return this.audio.currentTime;
-  }
-
-  /**
-   * Get total duration in seconds
-   */
-  getDuration(): number {
-    return this.audio.duration;
-  }
-
-  /**
-   * Check if audio is currently playing
-   */
-  isAudioPlaying(): boolean {
-    return this.isPlaying;
-  }
-
-  /**
-   * Get the underlying HTMLAudioElement for advanced use
-   */
-  getAudioElement(): HTMLAudioElement {
-    return this.audio;
-  }
+interface Item {
+  id: number;
+  name: string;
+  price: number;
 }
 
-// Default export
-export default AudioPlayer;
+/**
+ * Calculate total price of items using typed reduce
+ */
+export function calculateTotal(items: Item[]): number {
+  return items.reduce((total: number, item: Item) => total + item.price, 0);
+}
 
-// Example usage (commented out for library use)
-/*
-const player = new AudioPlayer();
-player.load('path/to/audio.mp3');
-player.play();
-*/
+/**
+ * Group items by price range using typed reduce
+ */
+export function groupByPriceRange(items: Item[]): Record<string, Item[]> {
+  return items.reduce((groups: Record<string, Item[]>, item: Item) => {
+    const range = item.price < 10 ? 'cheap' : item.price < 50 ? 'medium' : 'expensive';
+    
+    if (!groups[range]) {
+      groups[range] = [];
+    }
+    
+    groups[range].push(item);
+    return groups;
+  }, {});
+}
+
+// Example usage
+const sampleItems: Item[] = [
+  { id: 1, name: 'Coffee', price: 5.99 },
+  { id: 2, name: 'Book', price: 25.50 },
+  { id: 3, name: 'Laptop', price: 999.99 }
+];
+
+export { sampleItems };

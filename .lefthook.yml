@@ -1,0 +1,22 @@
+pre-commit:
+  commands:
+    format:
+      glob: "*.{js,ts,tsx,json}"
+      run: pnpm run format
+    lint:
+      glob: "*.{js,ts,tsx}"
+      run: pnpm run lint:fix
+    typecheck:
+      run: pnpm run typecheck
+    build:
+      run: pnpm run build
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}
+
+pre-push:
+  commands:
+    test:
+      run: pnpm run test
