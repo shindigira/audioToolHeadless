@@ -13,7 +13,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
@@ -25,6 +27,9 @@
     "lint": "biome lint ./src",
     "lint:fix": "biome check --write ./src",
     "format": "biome format --write ./src",
+    "docs": "typedoc",
+    "docs:clean": "rimraf docs",
+    "predocs": "pnpm run docs:clean",
     "test": "echo \"No tests created\" && exit 1",
     "release": "release-it",
     "release:patch": "release-it patch",
@@ -40,6 +45,7 @@
     "release-it": "^17.0.1",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.5",
+    "typedoc": "^0.28.12",
     "typescript": "^5.6.3"
   }
 }
