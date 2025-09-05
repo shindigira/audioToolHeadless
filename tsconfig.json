@@ -22,7 +22,18 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"],
+      "@/adapters/*": ["./adapters/*"],
+      "@/constants/*": ["./constants/*"],
+      "@/events/*": ["./events/*"],
+      "@/helpers/*": ["./helpers/*"],
+      "@/mediasession/*": ["./mediasession/*"],
+      "@/states/*": ["./states/*"],
+      "@/types/*": ["./types/*"]
+    }
   },
   "include": [
     "src/**/*"

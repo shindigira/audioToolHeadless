@@ -1,13 +1,32 @@
+
 # AudioTool Headless
 
-A lightweight TypeScript module for utility functions without UI dependencies.
+A lightweight TypeScript audio format wrapper that provides universal HLS support across all browsers using hls.js.
+
+## Audio Format Support
+
+### Native Browser Support
+- **MP3** (.mp3) → Supported in all major browsers
+- **AAC** (.aac, .m4a, .mp4) → Supported in all major browsers  
+- **WAV** (.wav) → Supported everywhere, but large file sizes
+- **OGG Vorbis** (.ogg) → Supported by Chrome/Firefox/Edge, not always Safari
+- **Opus** (.opus) → Supported in Chrome/Firefox/Edge; Safari has partial support
+
+### HLS Streaming Support
+- **Safari** (macOS + iOS) → Native HLS support in audio object
+- **Chrome/Firefox/Edge** → No native HLS support, uses hls.js wrapper
 
 ## Features
 
+- 🎵 **Universal HLS support** - Works across all browsers using hls.js
+- 🎛️ **Built-in Equalizer** - 10-band EQ with presets and bass boost
+- 📱 **Media Session API** - OS-level media controls and notifications  
+- 🔄 **Queue Management** - Playlist support with shuffle, loop, and navigation
+- ⚡ **Multiple Playback Rates** - 1x to 3x speed control
+- 📊 **State Management** - Observable state with custom event system
 - ✨ **TypeScript first** - Full type safety and IntelliSense support
 - 📦 **Dual package** - Works with both ESM and CommonJS
-- 🔧 **Zero dependencies** - Lightweight and fast
-- 📋 **Well documented** - Complete JSDoc coverage
+- 🔧 **Lightweight** - Minimal dependencies, only hls.js when needed
 - 🧪 **Fully typed** - Comprehensive TypeScript definitions
 
 ## Installation
@@ -25,103 +44,271 @@ yarn add audiotoolheadless
 ### ES Modules
 
 ```typescript
-import { calculateTotal, groupByPriceRange, type Item } from 'audiotoolheadless';
+import { AudioHeadless, type MediaTrack } from 'audiotoolheadless';
 
-const items: Item[] = [
-  { id: 1, name: 'Coffee', price: 5.99 },
-  { id: 2, name: 'Book', price: 25.50 },
-  { id: 3, name: 'Laptop', price: 999.99 }
-];
+// Create audio player instance
+const audioPlayer = new AudioHeadless();
 
-// Calculate total price
-const total = calculateTotal(items);
-console.log(`Total: $${total}`); // Total: $1031.48
+// Initialize the player
+await audioPlayer.init({
+  mode: 'VANILLA',
+  useDefaultEventListeners: true,
+  enableHls: true, // Enable HLS support
+  enableEQ: true,  // Enable equalizer
+  showNotificationActions: true,
+  autoPlay: false,
+  preloadStrategy: 'auto'
+});
 
-// Group items by price range
-const grouped = groupByPriceRange(items);
-console.log(grouped);
-// {
-//   cheap: [{ id: 1, name: 'Coffee', price: 5.99 }],
-//   medium: [{ id: 2, name: 'Book', price: 25.50 }],
-//   expensive: [{ id: 3, name: 'Laptop', price: 999.99 }]
-// }
+// Create a media track
+const track: MediaTrack = {
+  id: '1',
+  title: 'My Song',
+  source: 'https://example.com/audio.mp3',
+  artist: 'Artist Name',
+  album: 'Album Name',
+  artwork: [{ src: 'https://example.com/artwork.jpg' }]
+};
+
+// Play regular audio formats (MP3, AAC, WAV, OGG, Opus)
+await audioPlayer.addMedia(track);
+await audioPlayer.play();
+
+// Play HLS streams (works on all browsers)
+const hlsTrack: MediaTrack = {
+  id: '2',
+  title: 'Live Stream',
+  source: 'https://example.com/stream.m3u8',
+  artist: 'Live Artist',
+  artwork: null
+};
+
+await audioPlayer.addMediaAndPlay(hlsTrack);
+
+// Subscribe to state changes
+audioPlayer.subscribe('AUDIO_STATE', (state) => {
+  console.log('Audio state changed:', state);
+});
+
+// Control playback
+audioPlayer.pause();
+audioPlayer.setVolume(75); // 0-100
+audioPlayer.seek(30); // Seek to 30 seconds
+audioPlayer.setPlaybackRate(1.5); // 1.5x speed
 ```
 
 ### CommonJS
 
 ```javascript
-const { calculateTotal, groupByPriceRange } = require('audiotoolheadless');
+const { AudioHeadless } = require('audiotoolheadless');
 
-const items = [
-  { id: 1, name: 'Coffee', price: 5.99 },
-  { id: 2, name: 'Book', price: 25.50 }
-];
+const audioPlayer = new AudioHeadless();
 
-const total = calculateTotal(items);
-console.log(`Total: $${total}`);
+// Initialize and play
+audioPlayer.init({
+  mode: 'VANILLA',
+  useDefaultEventListeners: true,
+  enableHls: true
+}).then(() => {
+  const track = {
+    id: '1',
+    title: 'My Song',
+    source: 'https://example.com/audio.mp3',
+    artwork: null
+  };
+  
+  return audioPlayer.addMediaAndPlay(track);
+}).then(() => {
+  console.log('Playing audio');
+});
 ```
 
 ## API Reference
 
-### Types
+### Classes
 
-#### `Item`
+#### `AudioHeadless`
+
+The main audio player class that provides universal audio format support with HLS streaming capabilities, queue management, equalizer, and media session integration.
 
 ```typescript
-interface Item {
-  id: number;
-  name: string;
-  price: number;
+class AudioHeadless {
+  constructor();
+  
+  // Core methods
+  init(initProps: AudioInit): Promise<void>;
+  addMedia(mediaTrack: MediaTrack, mediaFetchFn?: (track: MediaTrack) => Promise<void>): Promise<void>;
+  addMediaAndPlay(mediaTrack?: MediaTrack, fetchFn?: (track: MediaTrack) => Promise<void>): Promise<void>;
+  play(): Promise<void>;
+  pause(): void;
+  stop(): void;
+  reset(): Promise<void>;
+  destroy(): Promise<void>;
+  
+  // Playback control
+  setVolume(volume: number): void; // 0-100
+  setPlaybackRate(playbackRate: PlaybackRate): void;
+  seek(time: number): void;
+  seekBy(time: number): void;
+  mute(): void;
+  
+  // Queue management
+  addQueue(queue: MediaTrack[], playbackType: QueuePlaybackType): void;
+  addToQueue(mediaTracks: MediaTrack | MediaTrack[]): void;
+  playNext(): void;
+  playPrevious(): void;
+  clearQueue(): void;
+  removeFromQueue(mediaTrack: MediaTrack): void;
+  getQueue(): MediaTrack[];
+  
+  // Shuffle and Loop
+  toggleShuffle(): void;
+  loop(loopMode: LoopMode): void;
+  isShuffledEnabled(): boolean;
+  getLoopMode(): LoopMode;
+  
+  // Equalizer
+  attachEq(): void;
+  getPresets(): Preset[];
+  setPreset(id: keyof Preset): void;
+  setCustomEQ(gains: number[]): void;
+  setBassBoost(enabled: boolean, boost: number): void;
+  
+  // Event handling
+  subscribe(eventName: string, callback: (data: any) => void, state?: any): () => void;
+  addEventListener(event: keyof HTMLMediaElementEventMap, callback: (data: any) => void): void;
+  
+  // Static methods
+  static getAudioInstance(): HTMLAudioElement;
 }
 ```
 
-### Functions
+### Types
 
-#### `calculateTotal(items: Item[]): number`
+#### `AudioInit`
 
-Calculate the total price of all items using typed reduce.
+Configuration object for initializing AudioX.
 
-**Parameters:**
-- `items` - Array of items to calculate total for
-
-**Returns:**
-- `number` - Sum of all item prices
-
-**Example:**
 ```typescript
-const total = calculateTotal([
-  { id: 1, name: 'Coffee', price: 5.99 },
-  { id: 2, name: 'Book', price: 25.50 }
-]);
-// Returns: 31.49
+interface AudioInit {
+  mode: InitMode; // 'REACT' | 'VANILLA'
+  useDefaultEventListeners: boolean;
+  showNotificationActions?: boolean;
+  preloadStrategy?: 'none' | 'metadata' | 'auto';
+  playbackRate?: PlaybackRate;
+  customEventListeners?: EventListenerCallbackMap | null;
+  autoPlay?: boolean;
+  enablePlayLog?: boolean;
+  enableHls?: boolean; // Enable HLS support
+  enableEQ?: boolean;  // Enable equalizer
+  crossOrigin?: 'anonymous' | 'use-credentials' | null;
+  hlsConfig?: HlsConfig;
+}
 ```
 
-#### `groupByPriceRange(items: Item[]): Record<string, Item[]>`
+#### `MediaTrack`
 
-Group items by price range (cheap, medium, expensive) using typed reduce.
+Represents an audio track with metadata.
+
+```typescript
+interface MediaTrack {
+  id: string;
+  title: string;
+  source: string; // URL to audio file or HLS stream (.m3u8)
+  artwork: MediaArtwork[] | null;
+  duration?: number;
+  genre?: string;
+  album?: string;
+  comment?: string;
+  year?: number | string;
+  artist?: string;
+}
+```
+
+#### `MediaArtwork`
+
+```typescript
+interface MediaArtwork {
+  src: string;
+  name?: string;
+  sizes?: string;
+}
+```
+
+### Core Methods
+
+#### `init(initProps: AudioInit): Promise<void>`
+
+Initialize the AudioHeadless instance with configuration options.
+
+**Required before any playback operations.**
+
+#### `addMedia(mediaTrack: MediaTrack): Promise<void>`
+
+Load a media track. Automatically detects HLS streams (.m3u8) and uses hls.js for browsers without native HLS support.
+
+#### `addMediaAndPlay(mediaTrack: MediaTrack): Promise<void>`
+
+Convenience method that loads and immediately plays a media track.
+
+#### `play(): Promise<void>`
+
+Start audio playback. Media must be loaded first.
+
+#### `setVolume(volume: number): void`
+
+Set playback volume.
 
 **Parameters:**
-- `items` - Array of items to group
+- `volume` - Volume level between 0 (muted) and 100 (full volume)
 
-**Returns:**
-- `Record<string, Item[]>` - Object with price range keys and item arrays
+#### `setPlaybackRate(playbackRate: PlaybackRate): void`
 
-**Price ranges:**
-- `cheap`: < $10
-- `medium`: $10 - $50  
-- `expensive`: > $50
+Set playback speed.
 
-**Example:**
+**Parameters:**
+- `playbackRate` - Speed multiplier: `1.0 | 1.25 | 1.5 | 1.75 | 2.0 | 2.5 | 3.0`
+
+### Queue Management
+
+#### `addQueue(queue: MediaTrack[], playbackType: QueuePlaybackType): void`
+
+Set the playback queue.
+
+**Parameters:**
+- `queue` - Array of media tracks
+- `playbackType` - `'DEFAULT' | 'REVERSE' | 'SHUFFLE'`
+
+#### `playNext(): void` / `playPrevious(): void`
+
+Navigate through the queue.
+
+### Equalizer Methods
+
+#### `setPreset(id: keyof Preset): void`
+
+Apply a preset equalizer setting.
+
+#### `setCustomEQ(gains: number[]): void`
+
+Apply custom equalizer gains.
+
+### Events
+
+Subscribe to events using the `subscribe()` method:
+
 ```typescript
-const grouped = groupByPriceRange([
-  { id: 1, name: 'Coffee', price: 5.99 },
-  { id: 2, name: 'Laptop', price: 999.99 }
-]);
-// Returns: {
-//   cheap: [{ id: 1, name: 'Coffee', price: 5.99 }],
-//   expensive: [{ id: 2, name: 'Laptop', price: 999.99 }]
-// }
+const unsubscribe = audioPlayer.subscribe('AUDIO_STATE', (state) => {
+  console.log('State changed:', state.playbackState);
+});
+
+// Unsubscribe when done
+unsubscribe();
 ```
+
+**Available Events:**
+- `AUDIO_STATE` - Audio state changes (play, pause, track change, etc.)
+- Standard HTML5 audio events via `addEventListener()`
 
 ## Development
 

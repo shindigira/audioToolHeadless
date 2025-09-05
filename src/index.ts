@@ -1,41 +1,50 @@
-/**
- * Example TypeScript function demonstrating typed .reduce
- */
 
-interface Item {
-  id: number;
-  name: string;
-  price: number;
-}
+import { AudioHeadless } from '@/audio';
+import { AUDIO_X_CONSTANTS } from '@/constants/common';
+import { AUDIO_EVENTS } from '@/events/audioEvents';
+import { AUDIO_STATE } from '@/states/audioState';
+import type {
+  AudioError,
+  AudioEvents,
+  AudioInit,
+  AudioState,
+  Band,
+  EqualizerStatus,
+  ErrorEvents,
+  EventListenerCallbackMap,
+  EventListenersList,
+  InitMode,
+  MediaArtwork,
+  MediaTrack,
+  NetworkState,
+  PlayBackState,
+  PlaybackRate,
+  Preset,
+  QueuePlaybackType,
+  ReadyState,
+} from '@/types';
 
-/**
- * Calculate total price of items using typed reduce
- */
-export function calculateTotal(items: Item[]): number {
-  return items.reduce((total: number, item: Item) => total + item.price, 0);
-}
-
-/**
- * Group items by price range using typed reduce
- */
-export function groupByPriceRange(items: Item[]): Record<string, Item[]> {
-  return items.reduce((groups: Record<string, Item[]>, item: Item) => {
-    const range = item.price < 10 ? 'cheap' : item.price < 50 ? 'medium' : 'expensive';
-    
-    if (!groups[range]) {
-      groups[range] = [];
-    }
-    
-    groups[range].push(item);
-    return groups;
-  }, {});
-}
-
-// Example usage
-const sampleItems: Item[] = [
-  { id: 1, name: 'Coffee', price: 5.99 },
-  { id: 2, name: 'Book', price: 25.50 },
-  { id: 3, name: 'Laptop', price: 999.99 }
-];
-
-export { sampleItems };
+export {
+  AUDIO_EVENTS,
+  AUDIO_STATE,
+  AUDIO_X_CONSTANTS,
+  type AudioError,
+  type AudioEvents,
+  type AudioInit,
+  type AudioState,
+  AudioHeadless,
+  type Band,
+  type EqualizerStatus,
+  type ErrorEvents,
+  type EventListenerCallbackMap,
+  type EventListenersList,
+  type InitMode,
+  type MediaArtwork,
+  type MediaTrack,
+  type NetworkState,
+  type PlayBackState,
+  type PlaybackRate,
+  type Preset,
+  type QueuePlaybackType,
+  type ReadyState,
+};
