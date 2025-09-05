@@ -1,7 +1,7 @@
 import { AudioHeadless } from '@/audio';
 import { ERROR_MSG_MAP } from '@/constants/common';
 import { listen, notify } from '@/helpers/notifier';
-import type { AudioEvents, AudioState, MediaTrack } from '@/types';
+import type { AudioEvents, MediaTrack, PlayerState } from '@/types';
 import type { LoopMode } from '@/types/audio.types';
 
 const isValidArray = (arr: any[]) => arr && Array.isArray(arr) && arr.length;
@@ -106,7 +106,7 @@ const handleQueuePlayback = () => {
   const audio = new AudioHeadless();
   let hasEnded = false;
 
-  const audioStateListener = (state: AudioState) => {
+  const audioStateListener = (state: PlayerState) => {
     if (state.playbackState === 'ended' && !hasEnded) {
       const queue = audio.getQueue();
       hasEnded = true;
@@ -165,7 +165,7 @@ const handleLoopPlayback = (loopMode: LoopMode) => {
     // switching off single
     handleLoopPlayback('OFF');
     console.log('LOOP_MODE', loopMode);
-    listen('AUDIO_STATE', (audioState: AudioState) => {
+    listen('AUDIO_STATE', (audioState: PlayerState) => {
       if (audioState.playbackState === 'queueended' && isValidArray(queue)) {
         audio.addMediaAndPlay(queue[0]);
       }

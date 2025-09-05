@@ -4,11 +4,11 @@ import { isValidArray } from '@/helpers/common';
 import { notify } from '@/helpers/notifier.js';
 import type {
   AudioEvents,
-  EventListenerCallbackMap,
+  EventCallbackMap,
   EventListenersList,
+  HlsEventCallbackMap,
   HlsEvents,
-  HlsEventsCallbackMap,
-} from '@/types/audioEvents.types';
+} from '@/types';
 import type { HlsListeners } from 'hls.js';
 import { AUDIO_EVENTS, HLS_EVENTS } from './audioEvents';
 
@@ -17,7 +17,7 @@ import { AUDIO_EVENTS, HLS_EVENTS } from './audioEvents';
  * loops through the event listeners map and attaches it to the audio element
  */
 const attachEventListeners = (
-  eventListenersCallbackMap: EventListenerCallbackMap,
+  eventListenersCallbackMap: EventCallbackMap,
   playLogEnabled = false,
 ) => {
   const audioInstance = AudioHeadless.getAudioInstance();
@@ -58,7 +58,7 @@ const attachCustomEventListeners = (
 };
 
 const attachHlsEventsListeners = (
-  hlsEventlistenerCallbackMap: HlsEventsCallbackMap,
+  hlsEventlistenerCallbackMap: HlsEventCallbackMap,
   playLogEnabled = false,
 ) => {
   const hls = new HlsAdapter();

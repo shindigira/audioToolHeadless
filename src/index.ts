@@ -31,15 +31,6 @@ export type {
   InitMode,
   PreloadStrategy,
   CrossOriginValue,
-  // Legacy type aliases for backward compatibility
-  AudioInit,
-  AudioState,
-  AudioError,
-  PlayBackState,
-  EventListenerCallbackMap,
-  Band,
-  Preset,
-  HlsEventsCallbackMap,
 } from '@/types';
 
 // Export configuration constants

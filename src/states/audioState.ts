@@ -2,7 +2,7 @@ import { PLAYBACK_STATE } from '@/constants/common';
 import { diffChecker } from '@/helpers/common';
 import { getLatestState, listen, notify } from '@/helpers/notifier';
 import type { ReadyState } from '@/types';
-import type { AudioState, MediaTrack } from '@/types/audio.types';
+import type { MediaTrack, PlayerState } from '@/types';
 
 export const READY_STATE: ReadyState = {
   HAVE_NOTHING: 0,
@@ -12,7 +12,7 @@ export const READY_STATE: ReadyState = {
   HAVE_ENOUGH_DATA: 4,
 };
 
-export const AUDIO_STATE: AudioState = {
+export const AUDIO_STATE: PlayerState = {
   playbackState: PLAYBACK_STATE.IDLE,
   duration: 0,
   bufferedDuration: 0,
@@ -35,8 +35,8 @@ export const AUDIO_STATE: AudioState = {
 */
 listen(
   'AUDIO_STATE',
-  (audioState: AudioState) => {
-    const latestState = getLatestState('AUDIO_X_STATE') as AudioState;
+  (audioState: PlayerState) => {
+    const latestState = getLatestState('AUDIO_X_STATE') as PlayerState;
     if (!diffChecker(latestState, audioState)) {
       notify('AUDIO_X_STATE', { ...AUDIO_STATE, ...audioState });
     }

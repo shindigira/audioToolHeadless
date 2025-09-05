@@ -17,13 +17,13 @@ import { getLatestState, listen, notify } from '@/helpers/notifier';
 // Media session functionality moved to MediaSessionManager
 import { READY_STATE } from '@/states/audioState';
 import type {
-  AudioInit,
-  AudioState,
   EqualizerPresets,
   EqualizerStatus,
   LoopMode,
   MediaTrack,
   PlaybackRate,
+  PlayerConfiguration,
+  PlayerState,
   QueuePlaybackType,
 } from '@/types';
 
@@ -82,7 +82,7 @@ class AudioHeadless {
    * @param attachMediaSessionHandlers flag for registering mediaSession handlers
    */
 
-  async init(initProps: AudioInit) {
+  async init(initProps: PlayerConfiguration) {
     const {
       preloadStrategy = 'auto',
       autoPlay = false,
@@ -360,7 +360,7 @@ class AudioHeadless {
 
   addQueue(queue: MediaTrack[], playbackType: QueuePlaybackType) {
     this.clearQueue();
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const playerQueue = isValidArray(queue) ? queue.slice() : [];
     const _currentTrack = isValidObject(audioState.currentTrack)
       ? audioState.currentTrack
@@ -436,7 +436,7 @@ class AudioHeadless {
 
   toggleShuffle() {
     // isShuffled is false initially
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const currentQueue = this._queue ?? this.getQueue();
     this.clearQueue(); // clearing Queue to check if it still stays
     const _currentTrack = isValidObject(audioState.currentTrack)

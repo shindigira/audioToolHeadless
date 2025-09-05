@@ -267,7 +267,7 @@ interface MediaArtwork {
 
 ### Core Methods
 
-#### `init(initProps: AudioInit): Promise<void>`
+#### `init(initProps: PlayerConfiguration): Promise<void>`
 
 Initialize the AudioHeadless instance with configuration options.
 
@@ -315,7 +315,7 @@ Navigate through the queue.
 
 ### Equalizer Methods
 
-#### `setPreset(id: keyof Preset): void`
+#### `setPreset(id: keyof EqualizerPresets): void`
 
 Apply a preset equalizer setting.
 

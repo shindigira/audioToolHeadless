@@ -1,8 +1,8 @@
 import { PLAYBACK_STATE } from '@/constants/common';
 import { notify } from '@/helpers/notifier';
-import type { HlsEventsCallbackMap } from '@/types/audioEvents.types';
+import type { HlsEventCallbackMap } from '@/types';
 
-export const HLS_EVENTS_CALLBACK_MAP: HlsEventsCallbackMap = {
+export const HLS_EVENTS_CALLBACK_MAP: HlsEventCallbackMap = {
   ERROR: (e: Event, data: any) => {
     const type = data.type;
     const detail = data.details;

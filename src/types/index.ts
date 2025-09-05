@@ -257,32 +257,3 @@ export interface ErrorMessageMap {
   MEDIA_ERR_SRC_NOT_SUPPORTED: string;
   DEFAULT: string;
 }
-
-// ==================== TYPE ALIASES FOR BACKWARD COMPATIBILITY ====================
-
-/** @deprecated Use PlayerConfiguration instead */
-export type AudioInit = PlayerConfiguration;
-
-/** @deprecated Use PlayerState instead */
-export type AudioState = PlayerState;
-
-/** @deprecated Use PlayerError instead */
-export type AudioError = PlayerError;
-
-/** @deprecated Use PlaybackState instead */
-export type PlayBackState = PlaybackState;
-
-/** @deprecated Use EventCallbackMap instead */
-export type EventListenerCallbackMap = EventCallbackMap;
-
-/** @deprecated Use EqualizerBand instead */
-export type Band = EqualizerBand;
-
-/** @deprecated Use EqualizerPresets instead */
-export type Preset = EqualizerPresets;
-
-/** @deprecated Use HlsEventCallbackMap instead */
-export type HlsEventsCallbackMap = HlsEventCallbackMap;
-
-/** @deprecated Use EventListenersList instead */
-export type EventListenersListLegacy = EventListenersList;

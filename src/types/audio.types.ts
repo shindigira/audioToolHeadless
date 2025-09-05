@@ -1,5 +1,5 @@
+import type { EventCallbackMap } from '@/types';
 import type { HlsConfig } from 'hls.js';
-import type { EventListenerCallbackMap } from './audioEvents.types';
 
 export type InitMode = 'REACT' | 'VANILLA';
 export type PlaybackRate = 1.0 | 1.25 | 1.5 | 1.75 | 2.0 | 2.5 | 3.0;
@@ -37,7 +37,7 @@ export interface AudioInit {
   showNotificationActions?: boolean;
   preloadStrategy?: Preload;
   playbackRate?: PlaybackRate;
-  customEventListeners?: EventListenerCallbackMap | null;
+  customEventListeners?: EventCallbackMap | null;
   autoPlay?: boolean;
   enablePlayLog?: boolean;
   enableHls?: boolean;

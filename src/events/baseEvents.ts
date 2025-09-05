@@ -6,9 +6,9 @@ import {
   getReadableErrorMessage,
 } from '@/helpers/common';
 import { getLatestState, notify } from '@/helpers/notifier';
-import type { AudioState, EventListenerCallbackMap } from '@/types';
+import type { EventCallbackMap, PlayerState } from '@/types';
 
-const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
+const BASE_EVENT_CALLBACK_MAP: EventCallbackMap = {
   LOAD_START: (e, audioInstance: HTMLAudioElement) => {
     console.log('STATUS', e.type);
     const bufferedDuration = getBufferedDuration(audioInstance);
@@ -27,7 +27,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
 
   DURATION_CHANGE: (e, audioInstance: HTMLAudioElement) => {
     console.log('STATUS', e.type);
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const bufferedDuration = getBufferedDuration(audioInstance);
 
     notify(
@@ -78,7 +78,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
 
   CAN_PLAY: (e: Event, audioInstance: HTMLAudioElement) => {
     console.log('STATUS', e.type);
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const bufferedDuration = getBufferedDuration(audioInstance);
 
     notify(
@@ -88,7 +88,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
           audioState.playbackState === 'paused' ? PLAYBACK_STATE.PAUSED : PLAYBACK_STATE.READY,
         error: { code: null, message: '', readable: '' },
         bufferedDuration,
-      } as AudioState,
+      } as PlayerState,
       `audiox_baseEvents_state_${e.type}`,
     );
   },
@@ -96,7 +96,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
   CAN_PLAY_THROUGH: (e: Event, audioInstance: HTMLAudioElement) => {
     console.log('STATUS', e.type);
 
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const isPaused = audioInstance.paused;
     const bufferedDuration = getBufferedDuration(audioInstance);
 
@@ -195,7 +195,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
 
   TIME_UPDATE: (e: Event, audioInstance: HTMLAudioElement) => {
     console.log('STATUS', e.type);
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const bufferedDuration = getBufferedDuration(audioInstance);
 
     notify(
@@ -229,7 +229,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
   },
 
   SEEKED: (e: any, audioInstance: HTMLAudioElement) => {
-    const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
+    const audioState = getLatestState('AUDIO_X_STATE') as PlayerState;
     const bufferedDuration = getBufferedDuration(audioInstance);
 
     notify(
@@ -239,7 +239,7 @@ const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
         progress: audioInstance?.currentTime,
         error: { code: null, message: '', readable: '' },
         bufferedDuration,
-      } as AudioState,
+      } as PlayerState,
       `audiox_baseEvents_state_${e.type}`,
     );
   },

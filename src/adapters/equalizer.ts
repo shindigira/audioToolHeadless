@@ -83,7 +83,7 @@ class Equalizer {
         filter.type = band.type;
         filter.frequency.value = band.frequency;
         filter.gain.value = band.gain;
-        filter.Q.value = band.q || 1; // Use a default Q of 1 if not specified
+        filter.Q.value = band.Q || 1; // Use a default Q of 1 if not specified
         return filter;
       });
 
