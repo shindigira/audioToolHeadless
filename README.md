@@ -391,17 +391,41 @@ pnpm run release:major   # Major release (0.0.1 -> 1.0.0)
 
 ```
 audioToolHeadless/
-├── src/
-│   └── index.ts          # Main source file
-├── dist/                 # Built files
+├── src/                  # Source code
+│   ├── core/             # Core player implementation
+│   │   └── player.ts     # Main AudioHeadless class
+│   ├── lib/              # Library modules
+│   │   ├── equalizer/    # Equalizer implementation
+│   │   ├── hls/          # HLS streaming support
+│   │   └── media-session/ # Media Session API integration
+│   ├── utils/            # Utility functions
+│   │   ├── validation.ts # Input validation
+│   │   ├── event-emitter.ts # Event handling
+│   │   ├── queue-manager.ts # Queue operations
+│   │   └── playback-utils.ts # Playback calculations
+│   ├── config/           # Configuration and constants
+│   │   └── index.ts      # Equalizer bands, presets, etc.
+│   ├── types/            # TypeScript type definitions
+│   │   └── index.ts      # All interfaces and types
+│   ├── events/           # Event handling
+│   ├── helpers/          # Helper functions
+│   ├── states/           # State management
+│   ├── constants/        # Application constants
+│   ├── adapters/         # Legacy adapter classes
+│   └── index.ts          # Main entry point
+├── dist/                 # Built files (auto-generated)
 │   ├── index.js          # ESM build
 │   ├── index.cjs         # CommonJS build
-│   └── index.d.ts        # Type definitions
-├── docs/                 # Generated documentation
+│   ├── index.d.ts        # Type definitions
+│   └── *.map             # Source maps
+├── docs/                 # Generated API documentation (TypeDoc)
 ├── package.json          # Package configuration
 ├── tsconfig.json         # TypeScript configuration
-├── tsup.config.ts        # Build configuration
+├── tsup.config.ts        # Build configuration (tsup)
 ├── typedoc.json          # Documentation configuration
+├── biome.json            # Code formatting and linting
+├── commitlint.config.js  # Commit message linting
+├── .lefthook.yml         # Git hooks configuration
 └── README.md            # This file
 ```
 
