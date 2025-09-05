@@ -1,6 +1,6 @@
 {
   "name": "audiotoolheadless",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A modern, headless audio player with HLS support, equalizer, queue management, and media session integration",
   "type": "module",
   "main": "dist/index.cjs",
