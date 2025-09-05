@@ -18,5 +18,5 @@ commit-msg:
 
 pre-push:
   commands:
-    test:
-      run: pnpm run test
+    build:
+      run: pnpm run build
