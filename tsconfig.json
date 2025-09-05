@@ -26,13 +26,17 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],
-      "@/adapters/*": ["./adapters/*"],
-      "@/constants/*": ["./constants/*"],
-      "@/events/*": ["./events/*"],
-      "@/helpers/*": ["./helpers/*"],
-      "@/mediasession/*": ["./mediasession/*"],
-      "@/states/*": ["./states/*"],
-      "@/types/*": ["./types/*"]
+      "@/core/*": ["./core/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/lib/hls": ["./lib/hls/index"],
+      "@/lib/media-session": ["./lib/media-session/index"],
+      "@/lib/equalizer": ["./lib/equalizer/index"],
+      "@/utils/*": ["./utils/*"],
+      "@/config/*": ["./config/*"],
+      "@/types/*": ["./types/*"],
+      "@/types": ["./types/index"],
+      "@/config": ["./config/index"],
+      "@/utils": ["./utils/index"]
     }
   },
   "include": [

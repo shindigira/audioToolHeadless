@@ -1,16 +1,16 @@
-import { AudioHeadless } from '@/audio';
 import { bands, presets } from '@/constants/equalizer';
+import { AudioHeadless } from '@/core/player';
 import { isValidArray } from '@/helpers/common';
 
-import type { EqualizerStatus, Preset } from '@/types/equalizer.types';
+import type { EqualizerPresets, EqualizerStatus } from '@/types';
 
 class Equalizer {
   private static _instance: Equalizer;
-  private audioCtx: AudioContext;
-  private audioCtxStatus: EqualizerStatus;
-  private eqFilterBands: BiquadFilterNode[];
-  private bassBoostFilter: BiquadFilterNode;
-  private compressor: DynamicsCompressorNode;
+  private audioCtx!: AudioContext;
+  private audioCtxStatus!: EqualizerStatus;
+  private eqFilterBands!: BiquadFilterNode[];
+  private bassBoostFilter!: BiquadFilterNode;
+  private compressor!: DynamicsCompressorNode;
 
   /**
    * Creates an instance of Equalizer or returns the existing instance.
@@ -26,6 +26,8 @@ class Equalizer {
 
     this.initializeAudioContext();
 
+    // Store this instance as the **singleton** instance - ensures only one Equalizer
+    // exists across the app for consistent audio processing and resource management
     Equalizer._instance = this;
   }
 
@@ -43,7 +45,7 @@ class Equalizer {
       console.error('Web Audio API is not supported in this browser.');
     }
 
-    this.audioCtxStatus = 'ACTIVE';
+    this.audioCtxStatus = 'RUNNING';
     this.init();
 
     if (this.audioCtx.state === 'suspended') {
@@ -73,7 +75,7 @@ class Equalizer {
    */
   init() {
     try {
-      const audioInstance = AudioHeadless.getAudioInstance();
+      const audioInstance = AudioHeadless.getAudioElement();
       const audioSource = this.audioCtx.createMediaElementSource(audioInstance);
 
       const equalizerBands = bands.map((band) => {
@@ -100,27 +102,41 @@ class Equalizer {
       this.bassBoostFilter.gain.value = 0;
 
       // Connect the nodes
-      audioSource.connect(equalizerBands[0]);
-      for (let i = 0; i < equalizerBands.length - 1; i++) {
-        equalizerBands[i].connect(equalizerBands[i + 1]);
+      if (equalizerBands.length > 0) {
+        const firstBand = equalizerBands[0];
+        if (firstBand) {
+          audioSource.connect(firstBand);
+        }
+
+        for (let i = 0; i < equalizerBands.length - 1; i++) {
+          const currentBand = equalizerBands[i];
+          const nextBand = equalizerBands[i + 1];
+          if (currentBand && nextBand) {
+            currentBand.connect(nextBand);
+          }
+        }
+
+        const lastBand = equalizerBands[equalizerBands.length - 1];
+        if (lastBand) {
+          lastBand.connect(this.bassBoostFilter);
+        }
       }
-      equalizerBands[equalizerBands.length - 1].connect(this.bassBoostFilter);
       this.bassBoostFilter.connect(this.compressor);
       this.compressor.connect(this.audioCtx.destination);
 
-      this.audioCtxStatus = 'ACTIVE';
+      this.audioCtxStatus = 'RUNNING';
       this.eqFilterBands = equalizerBands;
     } catch (error) {
       console.error('Equalizer initialization failed:', error);
-      this.audioCtxStatus = 'FAILED';
+      this.audioCtxStatus = 'CLOSED';
     }
   }
 
   /**
    * Sets the equalizer to a predefined preset.
-   * @param {keyof Preset} id - The ID of the preset to apply.
+   * @param {keyof EqualizerPresets} id - The ID of the preset to apply.
    */
-  setPreset(id: keyof Preset) {
+  setPreset(id: keyof EqualizerPresets) {
     const preset = presets.find((el) => el.id === id);
     if (!preset) {
       console.error('Preset not found:', id);
@@ -136,13 +152,15 @@ class Equalizer {
     for (let index = 0; index < this.eqFilterBands.length; index++) {
       const band = this.eqFilterBands[index];
       const targetGain = preset.gains[index];
-      band.gain.setTargetAtTime(targetGain, currentTime, 0.05);
+      if (band && targetGain !== undefined) {
+        band.gain.setTargetAtTime(targetGain, currentTime, 0.05);
+      }
     }
   }
 
   /**
    * Retrieves the list of available presets.
-   * @returns {Preset[]} The list of available presets.
+   * @returns {EqualizerPresets} The list of available presets.
    */
   static getPresets() {
     return presets;
@@ -168,7 +186,10 @@ class Equalizer {
       const currentTime = this.audioCtx.currentTime;
       for (let index = 0; index < this.eqFilterBands.length; index++) {
         const band = this.eqFilterBands[index];
-        band.gain.setTargetAtTime(gains[index], currentTime, 0.05);
+        const gainValue = gains[index];
+        if (band && gainValue !== undefined) {
+          band.gain.setTargetAtTime(gainValue, currentTime, 0.05);
+        }
       }
     } else {
       console.error('Invalid array of gains provided.');

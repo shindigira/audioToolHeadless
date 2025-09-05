@@ -1,7 +1,7 @@
 
 # AudioTool Headless
 
-A lightweight TypeScript audio format wrapper that provides universal HLS support across all browsers using hls.js.
+A modern, lightweight TypeScript audio player library that provides universal HLS support, built-in equalizer, queue management, and media session integration across all browsers.
 
 ## Audio Format Support
 
@@ -18,16 +18,17 @@ A lightweight TypeScript audio format wrapper that provides universal HLS suppor
 
 ## Features
 
-- 🎵 **Universal HLS support** - Works across all browsers using hls.js
-- 🎛️ **Built-in Equalizer** - 10-band EQ with presets and bass boost
-- 📱 **Media Session API** - OS-level media controls and notifications  
-- 🔄 **Queue Management** - Playlist support with shuffle, loop, and navigation
-- ⚡ **Multiple Playback Rates** - 1x to 3x speed control
-- 📊 **State Management** - Observable state with custom event system
-- ✨ **TypeScript first** - Full type safety and IntelliSense support
-- 📦 **Dual package** - Works with both ESM and CommonJS
-- 🔧 **Lightweight** - Minimal dependencies, only hls.js when needed
-- 🧪 **Fully typed** - Comprehensive TypeScript definitions
+- 🎵 **Universal HLS Support** - Seamless streaming across all browsers using hls.js
+- 🎛️ **Built-in Equalizer** - 10-band EQ with presets and bass boost controls
+- 📱 **Media Session API** - Native OS-level media controls and notifications  
+- 🔄 **Advanced Queue Management** - Smart playlist handling with shuffle, loop modes, and navigation
+- ⚡ **Variable Playback Rates** - Smooth speed control from 1x to 3x
+- 📊 **Reactive State Management** - Observable state system with custom event emission
+- 🎯 **Modern Architecture** - Clean, modular design with absolute imports
+- ✨ **TypeScript First** - Complete type safety with intelligent IntelliSense
+- 📦 **Universal Package** - Works seamlessly with ESM and CommonJS
+- 🔧 **Zero Config** - Smart defaults with extensive customization options
+- 🧪 **Production Ready** - Comprehensive error handling and edge case coverage
 
 ## Installation
 
@@ -44,21 +45,24 @@ yarn add audiotoolheadless
 ### ES Modules
 
 ```typescript
-import { AudioHeadless, type MediaTrack } from 'audiotoolheadless';
+import { AudioHeadless, type MediaTrack, type PlayerConfiguration } from 'audiotoolheadless';
 
 // Create audio player instance
-const audioPlayer = new AudioHeadless();
+const player = new AudioHeadless();
 
-// Initialize the player
-await audioPlayer.init({
+// Initialize with configuration
+const config: PlayerConfiguration = {
   mode: 'VANILLA',
   useDefaultEventListeners: true,
-  enableHls: true, // Enable HLS support
-  enableEQ: true,  // Enable equalizer
-  showNotificationActions: true,
+  enableHls: true,           // Enable HLS streaming support
+  enableEqualizer: true,     // Enable 10-band equalizer
+  showNotificationActions: true, // OS-level media controls
   autoPlay: false,
-  preloadStrategy: 'auto'
-});
+  preloadStrategy: 'auto',
+  crossOrigin: 'anonymous'
+};
+
+await player.initialize(config);
 
 // Create a media track
 const track: MediaTrack = {
@@ -70,11 +74,11 @@ const track: MediaTrack = {
   artwork: [{ src: 'https://example.com/artwork.jpg' }]
 };
 
-// Play regular audio formats (MP3, AAC, WAV, OGG, Opus)
-await audioPlayer.addMedia(track);
-await audioPlayer.play();
+// Load and play audio
+await player.loadTrack(track);
+await player.play();
 
-// Play HLS streams (works on all browsers)
+// HLS streaming (works on all browsers)
 const hlsTrack: MediaTrack = {
   id: '2',
   title: 'Live Stream',
@@ -83,18 +87,30 @@ const hlsTrack: MediaTrack = {
   artwork: null
 };
 
-await audioPlayer.addMediaAndPlay(hlsTrack);
+await player.loadAndPlay(hlsTrack);
 
-// Subscribe to state changes
-audioPlayer.subscribe('AUDIO_STATE', (state) => {
-  console.log('Audio state changed:', state);
+// State management
+player.onStateChange((state) => {
+  console.log('Player state:', state.playbackState);
+  console.log('Current track:', state.currentTrack?.title);
 });
 
-// Control playback
-audioPlayer.pause();
-audioPlayer.setVolume(75); // 0-100
-audioPlayer.seek(30); // Seek to 30 seconds
-audioPlayer.setPlaybackRate(1.5); // 1.5x speed
+// Playback controls
+player.pause();
+player.setVolume(75);        // 0-100
+player.seekToTime(30);       // Seek to 30 seconds
+player.setPlaybackRate(1.5); // 1.5x speed
+
+// Queue management
+const playlist = [track, hlsTrack];
+player.setQueue(playlist);
+player.playNext();
+player.enableShuffle(true);
+player.setLoopMode('QUEUE');
+
+// Equalizer controls
+player.setEqualizerPreset('ROCK');
+player.setCustomEqualizer([1, 2, 0, -1, 3, 0, 2, 1, 0, -1]);
 ```
 
 ### CommonJS
@@ -102,24 +118,26 @@ audioPlayer.setPlaybackRate(1.5); // 1.5x speed
 ```javascript
 const { AudioHeadless } = require('audiotoolheadless');
 
-const audioPlayer = new AudioHeadless();
+const player = new AudioHeadless();
 
 // Initialize and play
-audioPlayer.init({
+player.initialize({
   mode: 'VANILLA',
   useDefaultEventListeners: true,
-  enableHls: true
+  enableHls: true,
+  enableEqualizer: true
 }).then(() => {
   const track = {
     id: '1',
     title: 'My Song',
     source: 'https://example.com/audio.mp3',
+    artist: 'Artist Name',
     artwork: null
   };
   
-  return audioPlayer.addMediaAndPlay(track);
+  return player.loadAndPlay(track);
 }).then(() => {
-  console.log('Playing audio');
+  console.log('Audio playing successfully');
 });
 ```
 
@@ -135,74 +153,86 @@ The main audio player class that provides universal audio format support with HL
 class AudioHeadless {
   constructor();
   
-  // Core methods
-  init(initProps: AudioInit): Promise<void>;
-  addMedia(mediaTrack: MediaTrack, mediaFetchFn?: (track: MediaTrack) => Promise<void>): Promise<void>;
-  addMediaAndPlay(mediaTrack?: MediaTrack, fetchFn?: (track: MediaTrack) => Promise<void>): Promise<void>;
+  // Core lifecycle methods
+  initialize(config: PlayerConfiguration): Promise<void>;
+  destroy(): Promise<void>;
+  reset(): Promise<void>;
+  
+  // Media loading and playback
+  loadTrack(track: MediaTrack, fetchFn?: (track: MediaTrack) => Promise<void>): Promise<void>;
+  loadAndPlay(track: MediaTrack, fetchFn?: (track: MediaTrack) => Promise<void>): Promise<void>;
   play(): Promise<void>;
   pause(): void;
   stop(): void;
-  reset(): Promise<void>;
-  destroy(): Promise<void>;
   
-  // Playback control
+  // Playback controls
   setVolume(volume: number): void; // 0-100
-  setPlaybackRate(playbackRate: PlaybackRate): void;
-  seek(time: number): void;
-  seekBy(time: number): void;
+  getVolume(): number;
+  setPlaybackRate(rate: PlaybackRate): void;
+  getPlaybackRate(): PlaybackRate;
+  seekToTime(seconds: number): void;
+  seekByTime(seconds: number): void;
   mute(): void;
+  unmute(): void;
+  isMuted(): boolean;
   
   // Queue management
-  addQueue(queue: MediaTrack[], playbackType: QueuePlaybackType): void;
-  addToQueue(mediaTracks: MediaTrack | MediaTrack[]): void;
+  setQueue(tracks: MediaTrack[], playbackType?: QueuePlaybackType): void;
+  addToQueue(tracks: MediaTrack | MediaTrack[]): void;
+  removeFromQueue(trackId: string): void;
+  clearQueue(): void;
+  getQueue(): MediaTrack[];
+  getCurrentTrackIndex(): number;
   playNext(): void;
   playPrevious(): void;
-  clearQueue(): void;
-  removeFromQueue(mediaTrack: MediaTrack): void;
-  getQueue(): MediaTrack[];
+  playTrackAt(index: number): void;
   
-  // Shuffle and Loop
-  toggleShuffle(): void;
-  loop(loopMode: LoopMode): void;
-  isShuffledEnabled(): boolean;
+  // Shuffle and Loop controls
+  enableShuffle(enabled: boolean): void;
+  isShuffleEnabled(): boolean;
+  setLoopMode(mode: LoopMode): void;
   getLoopMode(): LoopMode;
   
-  // Equalizer
-  attachEq(): void;
-  getPresets(): Preset[];
-  setPreset(id: keyof Preset): void;
-  setCustomEQ(gains: number[]): void;
-  setBassBoost(enabled: boolean, boost: number): void;
+  // Equalizer controls
+  initializeEqualizer(): void;
+  getEqualizerPresets(): EqualizerPresets;
+  setEqualizerPreset(presetName: keyof EqualizerPresets): void;
+  setCustomEqualizer(gains: number[]): void;
+  enableBassBoost(enabled: boolean, boost?: number): void;
+  getEqualizerState(): EqualizerStatus;
   
-  // Event handling
-  subscribe(eventName: string, callback: (data: any) => void, state?: any): () => void;
-  addEventListener(event: keyof HTMLMediaElementEventMap, callback: (data: any) => void): void;
+  // State and event handling
+  onStateChange(callback: (state: PlayerState) => void): () => void;
+  getCurrentState(): PlayerState;
+  addEventListener(event: keyof HTMLMediaElementEventMap, callback: EventListener): void;
+  removeEventListener(event: keyof HTMLMediaElementEventMap, callback: EventListener): void;
   
-  // Static methods
-  static getAudioInstance(): HTMLAudioElement;
+  // Static utilities
+  static getInstance(): AudioHeadless;
+  static getAudioElement(): HTMLAudioElement;
 }
 ```
 
 ### Types
 
-#### `AudioInit`
+#### `PlayerConfiguration`
 
-Configuration object for initializing AudioX.
+Configuration object for initializing the AudioHeadless player.
 
 ```typescript
-interface AudioInit {
+interface PlayerConfiguration {
   mode: InitMode; // 'REACT' | 'VANILLA'
   useDefaultEventListeners: boolean;
   showNotificationActions?: boolean;
-  preloadStrategy?: 'none' | 'metadata' | 'auto';
+  preloadStrategy?: PreloadStrategy; // 'none' | 'metadata' | 'auto'
   playbackRate?: PlaybackRate;
-  customEventListeners?: EventListenerCallbackMap | null;
+  customEventListeners?: EventCallbackMap | null;
   autoPlay?: boolean;
   enablePlayLog?: boolean;
-  enableHls?: boolean; // Enable HLS support
-  enableEQ?: boolean;  // Enable equalizer
-  crossOrigin?: 'anonymous' | 'use-credentials' | null;
-  hlsConfig?: HlsConfig;
+  enableHls?: boolean;        // Enable HLS streaming support
+  enableEqualizer?: boolean;  // Enable 10-band equalizer
+  crossOrigin?: CrossOriginValue; // 'anonymous' | 'use-credentials' | null
+  hlsConfig?: HlsConfig;      // HLS.js configuration options
 }
 ```
 

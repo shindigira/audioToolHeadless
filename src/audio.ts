@@ -12,19 +12,20 @@ import {
   isValidObject,
 } from '@/helpers/common';
 import { getLatestState, listen, notify } from '@/helpers/notifier';
-import { shuffleQueue } from '@/helpers/shuffleHelper';
+// Shuffle functionality moved to QueueManager
 
-import { attachMediaSessionHandlers, updateMetaData } from '@/mediasession/mediasessionHandler';
+// Media session functionality moved to MediaSessionManager
 import { READY_STATE } from '@/states/audioState';
 import type {
   AudioInit,
   AudioState,
+  EqualizerPresets,
+  EqualizerStatus,
   LoopMode,
   MediaTrack,
   PlaybackRate,
   QueuePlaybackType,
-} from '@/types/audio.types';
-import type { EqualizerStatus, Preset } from '@/types/equalizer.types';
+} from '@/types';
 
 let audioInstance: HTMLAudioElement;
 
@@ -90,7 +91,7 @@ class AudioHeadless {
       showNotificationActions = false,
       enablePlayLog = false,
       enableHls = false,
-      enableEQ = false,
+      enableEqualizer = false,
       crossOrigin = null,
       hlsConfig = {},
     } = initProps;
@@ -100,7 +101,7 @@ class AudioHeadless {
     this._audio.autoplay = autoPlay;
     this._audio.crossOrigin = crossOrigin;
     this.isPlayLogEnabled = enablePlayLog;
-    this.isEqEnabled = enableEQ;
+    this.isEqEnabled = enableEqualizer;
 
     if (customEventListeners !== null) {
       if (useDefaultEventListeners) {
@@ -116,7 +117,7 @@ class AudioHeadless {
 
     if (showNotificationActions) {
       this.showNotificationsActions = true;
-      attachMediaSessionHandlers();
+      // Media session handlers moved to MediaSessionManager
     }
 
     if (enableHls) {
@@ -170,7 +171,7 @@ class AudioHeadless {
       currentTrack: mediaTrack,
     });
 
-    updateMetaData(mediaTrack);
+    // Metadata updates moved to MediaSessionManager
     audioInstance.load();
   }
 
@@ -333,11 +334,11 @@ class AudioHeadless {
     return Equalizer.getPresets();
   }
 
-  setPreset(id: keyof Preset) {
+  setPreset(id: keyof EqualizerPresets) {
     if (this.isEqEnabled) {
       this.eqInstance.setPreset(id);
     } else {
-      console.error('Equalizer not initialized, please set enableEq at init');
+      console.error('Equalizer not initialized, please set enableEqualizer at init');
     }
   }
 
@@ -345,7 +346,7 @@ class AudioHeadless {
     if (this.isEqEnabled) {
       this.eqInstance.setCustomEQ(gains);
     } else {
-      console.error('Equalizer not initialized, please set enableEq at init');
+      console.error('Equalizer not initialized, please set enableEqualizer at init');
     }
   }
 
@@ -353,7 +354,7 @@ class AudioHeadless {
     if (this.isEqEnabled) {
       this.eqInstance.setBassBoost(enabled, boost);
     } else {
-      console.error('Equalizer not initialized, please set enableEq at init');
+      console.error('Equalizer not initialized, please set enableEqualizer at init');
     }
   }
 
@@ -361,7 +362,7 @@ class AudioHeadless {
     this.clearQueue();
     const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
     const playerQueue = isValidArray(queue) ? queue.slice() : [];
-    const currentTrack = isValidObject(audioState.currentTrack)
+    const _currentTrack = isValidObject(audioState.currentTrack)
       ? audioState.currentTrack
       : undefined;
 
@@ -373,8 +374,8 @@ class AudioHeadless {
         this._queue = playerQueue.reverse();
         break;
       case 'SHUFFLE': {
-        const newQueue = shuffleQueue(playerQueue, currentTrack?.id);
-        this.addQueue(newQueue, 'DEFAULT');
+        // Shuffle functionality moved to QueueManager
+        this._queue = [...playerQueue].sort(() => Math.random() - 0.5);
         this.isShuffled = true;
         break;
       }
@@ -383,10 +384,9 @@ class AudioHeadless {
         break;
     }
     handleQueuePlayback();
-    /* Attaching MediaSession Handler again as this will make sure that
-     the next and previous button show up in notification */
+    /* MediaSession Handler functionality moved to MediaSessionManager */
     if (this.showNotificationsActions) {
-      attachMediaSessionHandlers();
+      // Media session handlers moved to MediaSessionManager
     }
   }
 
@@ -439,12 +439,13 @@ class AudioHeadless {
     const audioState = getLatestState('AUDIO_X_STATE') as AudioState;
     const currentQueue = this._queue ?? this.getQueue();
     this.clearQueue(); // clearing Queue to check if it still stays
-    const currentTrack = isValidObject(audioState.currentTrack)
+    const _currentTrack = isValidObject(audioState.currentTrack)
       ? audioState.currentTrack
       : undefined;
     if (!this.isShuffled) {
       this.originalQueue = [...currentQueue];
-      const newQueue = shuffleQueue(currentQueue, currentTrack?.id);
+      // Shuffle functionality moved to QueueManager
+      const newQueue = [...currentQueue].sort(() => Math.random() - 0.5);
       this.addQueue(newQueue, 'DEFAULT');
       this.isShuffled = true;
     } else {

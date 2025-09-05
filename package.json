@@ -1,7 +1,7 @@
 {
   "name": "audiotoolheadless",
-  "version": "0.0.1",
-  "description": "Headless Audio Player",
+  "version": "1.0.0",
+  "description": "A modern, headless audio player with HLS support, equalizer, queue management, and media session integration",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -31,11 +31,46 @@
     "docs:clean": "rimraf docs",
     "predocs": "pnpm run docs:clean",
     "test": "echo \"No tests created\" && exit 1",
+    "validate": "pnpm run typecheck && pnpm run build",
+    "validate:strict": "pnpm run lint && pnpm run typecheck && pnpm run build",
+    "prepack": "pnpm run validate",
+    "prepublishOnly": "pnpm run validate",
     "release": "release-it",
     "release:patch": "release-it patch",
     "release:minor": "release-it minor",
     "release:major": "release-it major",
+    "publish:npm": "npm publish",
+    "publish:dry": "npm publish --dry-run",
+    "publish:beta": "npm publish --tag beta",
+    "publish:next": "npm publish --tag next",
+    "version:check": "npm version --no-git-tag-version",
+    "size:check": "npx package-size ./dist",
     "prepare": "lefthook install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shindigira/audioToolHeadless.git"
+  },
+  "homepage": "https://github.com/shindigira/audioToolHeadless#readme",
+  "bugs": {
+    "url": "https://github.com/shindigira/audioToolHeadless/issues"
+  },
+  "author": "shindigira",
+  "license": "MIT",
+  "keywords": [
+    "audio",
+    "player",
+    "headless",
+    "hls",
+    "equalizer",
+    "typescript",
+    "media-session",
+    "queue",
+    "streaming",
+    "html5-audio"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

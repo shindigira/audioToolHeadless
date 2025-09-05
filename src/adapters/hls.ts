@@ -17,7 +17,7 @@ let hlsInstance: Hls;
 
 class HlsAdapter {
   private static _instance: HlsAdapter;
-  private HlsClass: typeof Hls;
+  private HlsClass!: typeof Hls;
 
   constructor() {
     if (HlsAdapter._instance) {

@@ -1,0 +1,71 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Development and build files
+tsconfig.json
+tsup.config.ts
+biome.json
+.biomejs.json
+lefthook.yml
+commitlint.config.js
+
+# Documentation source
+typedoc.json
+docs/
+
+# Development dependencies
+node_modules/
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.pnpm-debug.log*
+
+# Environment and IDE files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+appveyor.yml
+
+# Testing
+coverage/
+.nyc_output/
+.jest/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Only include the dist folder for npm
+!dist/
+
+.cursor/

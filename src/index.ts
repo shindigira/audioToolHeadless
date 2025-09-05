@@ -1,50 +1,78 @@
+// Export the main player class
+export { AudioHeadless } from '@/core/player';
 
-import { AudioHeadless } from '@/audio';
-import { AUDIO_X_CONSTANTS } from '@/constants/common';
-import { AUDIO_EVENTS } from '@/events/audioEvents';
-import { AUDIO_STATE } from '@/states/audioState';
-import type {
-  AudioError,
+// Export types for external use
+export type {
+  // Core types
+  PlayerConfiguration,
+  PlayerState,
+  MediaTrack,
+  MediaArtwork,
+  PlaybackRate,
+  LoopMode,
+  QueuePlaybackType,
+  // Audio types
   AudioEvents,
+  HlsEvents,
+  // Equalizer types
+  EqualizerStatus,
+  EqualizerPresets,
+  EqualizerBand,
+  // Event types
+  EventCallbackMap,
+  HlsEventCallbackMap,
+  // Error types
+  PlayerError,
+  ErrorEvents,
+  // State types
+  ReadyState,
+  NetworkState,
+  // Configuration types
+  InitMode,
+  PreloadStrategy,
+  CrossOriginValue,
+  // Legacy type aliases for backward compatibility
   AudioInit,
   AudioState,
-  Band,
-  EqualizerStatus,
-  ErrorEvents,
-  EventListenerCallbackMap,
-  EventListenersList,
-  InitMode,
-  MediaArtwork,
-  MediaTrack,
-  NetworkState,
+  AudioError,
   PlayBackState,
-  PlaybackRate,
+  EventListenerCallbackMap,
+  Band,
   Preset,
-  QueuePlaybackType,
-  ReadyState,
+  HlsEventsCallbackMap,
 } from '@/types';
 
+// Export configuration constants
 export {
+  PLAYER_CONSTANTS,
+  PLAYBACK_STATES,
+  READY_STATES,
+  NETWORK_STATES,
+  ERROR_MESSAGES,
+  EXTERNAL_URLS,
+  EQUALIZER_PRESETS,
+  EQUALIZER_BANDS,
   AUDIO_EVENTS,
-  AUDIO_STATE,
+  HLS_EVENTS,
+  ERROR_EVENTS,
+  // Legacy constant exports for backward compatibility
   AUDIO_X_CONSTANTS,
-  type AudioError,
-  type AudioEvents,
-  type AudioInit,
-  type AudioState,
-  AudioHeadless,
-  type Band,
-  type EqualizerStatus,
-  type ErrorEvents,
-  type EventListenerCallbackMap,
-  type EventListenersList,
-  type InitMode,
-  type MediaArtwork,
-  type MediaTrack,
-  type NetworkState,
-  type PlayBackState,
-  type PlaybackRate,
-  type Preset,
-  type QueuePlaybackType,
-  type ReadyState,
-};
+  PLAYBACK_STATE,
+  READY_STATE,
+  ERROR_MSG_MAP,
+  URLS,
+} from '@/config';
+
+// Export utility classes for advanced usage
+export {
+  EventEmitter,
+  QueueManager,
+  ValidationUtils,
+  PlaybackUtils,
+} from '@/utils';
+
+// Export library modules for advanced integration
+export { Equalizer } from '@/lib/equalizer';
+
+// Legacy exports for backward compatibility
+export { AudioHeadless as AudioX } from '@/core/player';

@@ -1,4 +1,5 @@
 import { PLAYBACK_STATE } from '@/constants/common';
+import { ERROR_EVENTS } from '@/events/errorEvents';
 import {
   calculateActualPlayedLength,
   getBufferedDuration,
@@ -6,7 +7,6 @@ import {
 } from '@/helpers/common';
 import { getLatestState, notify } from '@/helpers/notifier';
 import type { AudioState, EventListenerCallbackMap } from '@/types';
-import { ERROR_EVENTS } from '@/events/errorEvents';
 
 const BASE_EVENT_CALLBACK_MAP: EventListenerCallbackMap = {
   LOAD_START: (e, audioInstance: HTMLAudioElement) => {

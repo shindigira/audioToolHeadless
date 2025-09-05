@@ -1,8 +1,8 @@
 import { AudioHeadless } from '@/audio';
 import { ERROR_MSG_MAP } from '@/constants/common';
+import { listen, notify } from '@/helpers/notifier';
 import type { AudioEvents, AudioState, MediaTrack } from '@/types';
 import type { LoopMode } from '@/types/audio.types';
-import { listen, notify } from '@/helpers/notifier';
 
 const isValidArray = (arr: any[]) => arr && Array.isArray(arr) && arr.length;
 const isValidFunction = (fn: any) => fn instanceof Function && typeof fn === 'function';
@@ -139,7 +139,12 @@ const shuffle = <T>(array: T[]): T[] => {
   for (let i = shuffledArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * i);
 
-    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    const temp = shuffledArray[i];
+    const other = shuffledArray[j];
+    if (temp !== undefined && other !== undefined) {
+      shuffledArray[i] = other;
+      shuffledArray[j] = temp;
+    }
   }
 
   return shuffledArray;
